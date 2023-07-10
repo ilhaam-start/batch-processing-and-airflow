@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from airflow import DAG
+from airflow import DAG, macros
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 
 default_args = {
@@ -25,7 +25,7 @@ extract_new_orders = """
     CREATE TABLE IF NOT EXISTS new_orders AS
     SELECT order_id, order_date, total_amount
     FROM orders
-    WHERE order_date >= '{{ prev_ds }}'
+    WHERE order_date >= '{{ macros.ds_add(ds, -1) }}'
     AND order_date <= '{{ ds }}';
 """
 
