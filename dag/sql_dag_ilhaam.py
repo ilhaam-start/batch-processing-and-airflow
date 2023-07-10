@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from airflow import DAG, macros
+from airflow import DAG
 from airflow.providers.postgres.operators.postgres import PostgresOperator
 
 default_args = {
@@ -25,7 +25,7 @@ extract_new_orders = """
     CREATE TABLE IF NOT EXISTS new_orders AS
     SELECT order_id, order_date, total_amount
     FROM orders
-    WHERE order_date >= '{{ macros.ds_add(ds, -1) }}'
+    WHERE order_date >= '{{ prev_ds }}'
     AND order_date <= '{{ ds }}';
 """
 
@@ -59,7 +59,7 @@ update_orders_summary = """
     FROM aggregated_orders
     ON CONFLICT (summary_date) DO UPDATE SET
         total_orders = orders_summary.total_orders + excluded.total_orders,
-        total_amount = orders_summary.total_revenue + excluded.total_revenue;
+        total_revenue = orders_summary.total_revenue + excluded.total_revenue;
 """
 
 # updates the orders_summary table with the aggregated data.
@@ -86,9 +86,9 @@ DROP TABLE aggregated_orders;
 '''
 
 t5 = PostgresOperator(
-    task_id='drop_aggregated_orders',
+    task_id="drop_aggregated_orders",
     sql=drop_aggregated_orders,
-    postgres_conn_id='ilhaam-batching-airflow',
+    postgres_conn_id="ilhaam-batching-airflow",
     dag=dag,
 )
 
