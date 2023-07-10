@@ -55,11 +55,11 @@ t2 = PostgresOperator(
 
 update_orders_summary = """
     INSERT INTO orders_summary (summary_date, total_orders, total_revenue)
-    SELECT date, total_orders, total_revenue
+    SELECT date, total_orders, total_amount
     FROM aggregated_orders
     ON CONFLICT (summary_date) DO UPDATE SET
         total_orders = orders_summary.total_orders + excluded.total_orders,
-        total_revenue = orders_summary.total_revenue + excluded.total_revenue;
+        total_amount = orders_summary.total_amount + excluded.total_amount;
 """
 
 # updates the orders_summary table with the aggregated data.
