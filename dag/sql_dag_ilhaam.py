@@ -33,7 +33,7 @@ extract_new_orders = """
 t1 = PostgresOperator(
     task_id='extract_new_orders',
     sql=extract_new_orders,
-    postgres_conn_id='Ilhaam-batching-airflow',
+    postgres_conn_id='ilhaam-batching-airflow',
     dag=dag,
 )
 
@@ -49,7 +49,7 @@ aggregate_new_orders = '''
 t2 = PostgresOperator(
     task_id='aggregate_new_orders',
     sql=aggregate_new_orders,
-    postgres_conn_id='Ilhaam-batching-airflow',
+    postgres_conn_id='ilhaam-batching-airflow',
     dag=dag,
 )
 
@@ -66,7 +66,7 @@ update_orders_summary = """
 t3 = PostgresOperator(
     task_id='update_orders_summary',
     sql=update_orders_summary,
-    postgres_conn_id='Ilhaam-batching-airflow',
+    postgres_conn_id='ilhaam-batching-airflow',
     dag=dag,
 )
 
@@ -77,7 +77,7 @@ DROP TABLE new_orders;
 t4 = PostgresOperator(
     task_id='drop_new_orders',
     sql=drop_new_orders,
-    postgres_conn_id='Ilhaam-batching-airflow',
+    postgres_conn_id='ilhaam-batching-airflow',
     dag=dag,
 )
 
@@ -88,7 +88,7 @@ DROP TABLE aggregated_orders;
 t5 = PostgresOperator(
     task_id='drop_aggregated_orders',
     sql=drop_aggregated_orders,
-    postgres_conn_id='Ilhaam-batching-airflow',
+    postgres_conn_id='ilhaam-batching-airflow',
     dag=dag,
 )
 
