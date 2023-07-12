@@ -13,7 +13,7 @@ default_args = {
 }
 
 dag = DAG(
-    'sales_etl_data',
+    'sales_data_dag',
     default_args=default_args,
     description='Extract, transform and load sales data',
     schedule_interval=timedelta(days=1),
@@ -39,11 +39,13 @@ t1 = PostgresOperator(
 
 transform_sales_data = '''
     CREATE TABLE IF NOT EXISTS sales_summary AS
-    SELECT region, sr.name AS sales_representative,
-            COUNT(*) AS total_transactions,
-            SUM(amount) AS total_sales_amount
+    SELECT regions.name AS region, sales_reps.name AS sales_representative,
+        COUNT(*) AS total_transactions,
+        SUM(raw_sales_data.amount) AS total_sales_amount
     FROM raw_sales_data
-    GROUP BY region, sales_representative;
+    JOIN sales_reps ON raw_sales_data.sales_rep_id = sales_reps.id
+    JOIN regions ON sales_reps.region_id = regions.id
+    GROUP BY regions.name, sales_reps.name;
 '''
 
 t2 = PostgresOperator(
@@ -54,7 +56,7 @@ t2 = PostgresOperator(
 )
 
 load_sales_summary = """
-    INSERT INTO sales_summary_table (region, sales_representative, total_transactions, total_sales_amount)
+    INSERT INTO sales_summary (region, sales_representative, total_transactions, total_sales_amount)
     SELECT region, sales_representative, total_transactions, total_sales_amount
     FROM sales_summary;
 """
